@@ -1,3 +1,5 @@
+using OBS.Model;
+
 namespace PolyBucket.Service.IServices;
 
 public interface IObsClient : IDisposable
