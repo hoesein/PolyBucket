@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyBucket.Service", "PolyBucket.Service\PolyBucket.Service.csproj", "{B87A4D0A-7E05-4D5A-8691-C789BD4C19AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PloyBucket.Test", "PloyBucket.Test\PloyBucket.Test.csproj", "{8B966EE8-4A76-4096-8A67-EAE86AB9A201}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyBucket.Test", "PloyBucket.Test\PolyBucket.Test.csproj", "{8B966EE8-4A76-4096-8A67-EAE86AB9A201}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E2D41922-0D2E-4F68-8951-54DD40EEEAAA}
 	EndGlobalSection
 EndGlobal
