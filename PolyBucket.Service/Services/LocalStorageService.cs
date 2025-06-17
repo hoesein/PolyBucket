@@ -1,16 +1,20 @@
 ﻿using Microsoft.Extensions.Logging;
 using PolyBucket.Service.Exceptions;
 using PolyBucket.Service.Models;
+using System.IO.Abstractions;
 
 namespace PolyBucket.Service.Services;
 
 public class LocalStorageService : BaseObjectStorageService
 {
-    public LocalStorageService(ObjectStorageOptions options, ILogger<BaseObjectStorageService> logger) : base(options, logger)
+    private readonly IFileSystem _fileSystem;
+    public LocalStorageService(ObjectStorageOptions options, ILogger<BaseObjectStorageService> logger, IFileSystem fileSystem) : base(options, logger)
     {
-        if (!Directory.Exists(options.LocalStoragePath))
+        _fileSystem = fileSystem;
+
+        if (!_fileSystem.Directory.Exists(options.LocalStoragePath))
         {
-            Directory.CreateDirectory(options.LocalStoragePath);
+            _fileSystem.Directory.CreateDirectory(options.LocalStoragePath);
         }
     }
 
@@ -19,13 +23,13 @@ public class LocalStorageService : BaseObjectStorageService
         ValidateInput(bucketName, objectName);
         try
         {
-            var bucketPath = Path.Combine(_options.LocalStoragePath, bucketName);
-            if (!Directory.Exists(bucketPath))
+            var bucketPath = _fileSystem.Path.Combine(_options.LocalStoragePath, bucketName);
+            if (!_fileSystem.Directory.Exists(bucketPath))
             {
-                Directory.CreateDirectory(bucketPath);
+                _fileSystem.Directory.CreateDirectory(bucketPath);
             }
-            var filePath = Path.Combine(bucketPath, objectName);
-            await using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            var filePath = _fileSystem.Path.Combine(bucketPath, objectName);
+            await using (var fileStream = _fileSystem.File.Create(filePath))
             {
                 await data.CopyToAsync(fileStream, cancellationToken);
             }
@@ -43,10 +47,10 @@ public class LocalStorageService : BaseObjectStorageService
         ValidateInput(bucketName, objectName);
         try
         {
-            var filePath = Path.Combine(_options.LocalStoragePath, bucketName, objectName);
-            if (File.Exists(filePath))
+            var filePath = _fileSystem.Path.Combine(_options.LocalStoragePath, bucketName, objectName);
+            if (_fileSystem.File.Exists(filePath))
             {
-                await Task.Run(() => File.Delete(filePath), cancellationToken);
+                await Task.Run(() => _fileSystem.File.Delete(filePath), cancellationToken);
                 _logger.LogInformation("File {ObjectName} deleted from bucket {BucketName}.", objectName, bucketName);
             }
             else
@@ -62,16 +66,16 @@ public class LocalStorageService : BaseObjectStorageService
         }
     }
 
-    public override Task DownloadFileAsync(string bucketName, string objectName, Stream outputStream, CancellationToken cancellationToken = default)
+    public override async Task DownloadFileAsync(string bucketName, string objectName, Stream outputStream, CancellationToken cancellationToken = default)
     {
         ValidateInput(bucketName, objectName);
         try
         {
-            var filePath = Path.Combine(_options.LocalStoragePath, bucketName, objectName);
-            if (File.Exists(filePath))
+            var filePath = _fileSystem.Path.Combine(_options.LocalStoragePath, bucketName, objectName);
+            if (_fileSystem.File.Exists(filePath))
             {
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                return fileStream.CopyToAsync(outputStream, cancellationToken);
+                using var fileStream = _fileSystem.File.OpenRead(filePath);
+                await fileStream.CopyToAsync(outputStream, cancellationToken);
             }
             else
             {
@@ -91,8 +95,8 @@ public class LocalStorageService : BaseObjectStorageService
         ValidateInput(bucketName, objectName);
         try
         {
-            var filePath = Path.Combine(_options.LocalStoragePath, bucketName, objectName);
-            return Task.FromResult(File.Exists(filePath));
+            var filePath = _fileSystem.Path.Combine(_options.LocalStoragePath, bucketName, objectName);
+            return Task.FromResult(_fileSystem.File.Exists(filePath));
         }
         catch (Exception ex)
         {
@@ -104,8 +108,8 @@ public class LocalStorageService : BaseObjectStorageService
     public override async Task<string> GeneratePresignedUrl(string bucketName, string objectName, TimeSpan expiry)
     {
         ValidateInput(bucketName, objectName);
-        var filepath = Path.Combine(_options.LocalStoragePath, bucketName, objectName);
-        if (!File.Exists(filepath))
+        var filepath = _fileSystem.Path.Combine(_options.LocalStoragePath, bucketName, objectName);
+        if (!_fileSystem.File.Exists(filepath))
         {
             throw new StorageFileNotFoundException($"File '{objectName}' not found in bucket '{bucketName}'.");
         }
@@ -120,13 +124,13 @@ public class LocalStorageService : BaseObjectStorageService
         }
         try
         {
-            var bucketPath = Path.Combine(_options.LocalStoragePath, bucketName);
-            if (!Directory.Exists(bucketPath))
+            var bucketPath = _fileSystem.Path.Combine(_options.LocalStoragePath, bucketName);
+            if (!_fileSystem.Directory.Exists(bucketPath))
             {
                 return Task.FromResult<IEnumerable<string>>(Array.Empty<string>());
             }
-            var files = Directory.GetFiles(bucketPath, prefix == null ? "*" : $"{prefix}*")
-                                 .Select(Path.GetFileName)
+            var files = _fileSystem.Directory.GetFiles(bucketPath, prefix == null ? "*" : $"{prefix}*")
+                                 .Select(_fileSystem.Path.GetFileName)
                                  .ToList();
             _logger.LogInformation("Listed {FileCount} files in bucket {BucketName}.", files.Count, bucketName);
             return Task.FromResult<IEnumerable<string>>(files);
