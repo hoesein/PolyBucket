@@ -67,4 +67,4 @@ jobs:
       # 4. Executes the unit tests. --no-build ensures we test the artifacts produced
       #    by the build job, which is a best practice. --verbosity normal provides clean test output.
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test -c Release --no-build --verbosity normal
