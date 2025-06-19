@@ -64,6 +64,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      # 4. Builds the project in release config
+      - name: Build Project
+        run: dotnet build --configuration Release --no-restore
+
       # 4. Executes the unit tests. --no-build ensures we test the artifacts produced
       #    by the build job, which is a best practice. --verbosity normal provides clean test output.
       - name: Run tests
