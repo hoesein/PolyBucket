@@ -14,7 +14,7 @@ jobs:
             git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
             git branch --remote --contains | grep origin/main
         - name: SET VERSION variable FROM TAG
-          run: ech "VERSION=${GITHUB_REF/refs\/tags\/v}" >> $GITHUB_ENV
+          run: echo "VERSION=${GITHUB_REF/refs\/tags\/v}" >> $GITHUB_ENV
         - name: BUILD
           run: dotnet build -c Release /p:Version=${VERSION}
         - name: TEST
