@@ -4,9 +4,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<PackageId>PolyBucket DotNet</PackageId>
+    <PackageId>PolyBucket DotNet</PackageId>
     <RepositoryType>git</RepositoryType>
-	<RepositoryUrl>https://github.com/hoesein/PolyBucket</RepositoryUrl>
+    <RepositoryUrl>https://github.com/hoesein/PolyBucket</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,5 +22,3 @@
   </ItemGroup>
 
 </Project>
-
-
