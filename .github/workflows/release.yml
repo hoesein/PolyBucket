@@ -18,7 +18,7 @@ jobs:
         
         - name: SETUP .NET
           uses: actions/setup-dotnet@v4
-            with:
+          with:
               dotnet-version: '9.0.x'
 
         - name: BUILD
@@ -27,7 +27,7 @@ jobs:
         - name: TEST
           run: dotnet test -c Release /p:Version=${VERSION} --no-build --output .
        
-       - name: PUSH
+        - name: PUSH
           run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN}
           env:
             GITHUB_TOKEN: ${{ secrets.NUGET_TOKEN }}
