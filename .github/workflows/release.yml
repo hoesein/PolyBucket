@@ -15,14 +15,19 @@ jobs:
             git branch --remote --contains | grep origin/main
         - name: SET VERSION variable FROM TAG
           run: echo "VERSION=${GITHUB_REF/refs\/tags\/v}" >> $GITHUB_ENV
+        
+        - name: SETUP .NET
+          uses: actions/setup-dotnet@v4
+            with:
+              dotnet-version: '9.0.x'
+
         - name: BUILD
-          uses: actions/setup-dotnet@v4
           run: dotnet build -c Release /p:Version=${VERSION}
+        
         - name: TEST
-          uses: actions/setup-dotnet@v4
           run: dotnet test -c Release /p:Version=${VERSION} --no-build --output .
-        - name: PUSH
-          uses: actions/setup-dotnet@v4
+       
+       - name: PUSH
           run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN}
           env:
             GITHUB_TOKEN: ${{ secrets.NUGET_TOKEN }}
