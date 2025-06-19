@@ -8,7 +8,7 @@ jobs:
       timeout-minutes: 15
       steps:
         - name: CHECKOUT
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
         - name: VERIFY COMMIT EXISTS IN origin/main
           run: |
             git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
@@ -16,10 +16,13 @@ jobs:
         - name: SET VERSION variable FROM TAG
           run: echo "VERSION=${GITHUB_REF/refs\/tags\/v}" >> $GITHUB_ENV
         - name: BUILD
+          uses: actions/setup-dotnet@v4
           run: dotnet build -c Release /p:Version=${VERSION}
         - name: TEST
+          uses: actions/setup-dotnet@v4
           run: dotnet test -c Release /p:Version=${VERSION} --no-build --output .
         - name: PUSH
+          uses: actions/setup-dotnet@v4
           run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN}
           env:
             GITHUB_TOKEN: ${{ secrets.NUGET_TOKEN }}
