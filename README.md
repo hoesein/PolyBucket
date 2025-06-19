@@ -1,3 +1,5 @@
+[![PolyBucket CI](https://github.com/hoesein/PolyBucket/actions/workflows/poly-bucket-ci.yml/badge.svg)](https://github.com/hoesein/PolyBucket/actions/workflows/poly-bucket-ci.yml)
+
 # Object Storage Service Library
 A generic C# library for interacting with multiple cloud storage providers with a unified API interface.
 
