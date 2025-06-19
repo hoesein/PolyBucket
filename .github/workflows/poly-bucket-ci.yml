@@ -1,0 +1,67 @@
+# This workflow is named "PolyBucket CI"
+name: PolyBucket CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  # Triggers the workflow on pull request events targeting the "main" branch
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # --- BUILD JOB ---
+  # This job is responsible for compiling the code to ensure it builds successfully.
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Sets up a specific version of the .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          # Replace with your target .NET version if different
+          dotnet-version: 8.0.x 
+
+      # 3. Restores the dependencies of your project
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. Builds the project in Release configuration. --no-restore is used for efficiency
+      #    as the previous step already handled restoring packages.
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+
+  # --- TEST JOB ---
+  # This job runs the unit tests. It depends on the 'build' job completing successfully.
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Specifies that this job needs the 'build' job to finish first
+    needs: build 
+
+    steps:
+      # 1. Checks-out your repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Sets up the .NET SDK (required again for this job)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # 3. Restores dependencies for the test projects
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. Executes the unit tests. --no-build ensures we test the artifacts produced
+      #    by the build job, which is a best practice. --verbosity normal provides clean test output.
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal
