@@ -25,9 +25,12 @@ jobs:
           run: dotnet build -c Release /p:Version=${VERSION}
         
         - name: TEST
-          run: dotnet test -c Release /p:Version=${VERSION} --no-build --output .
+          run: dotnet test -c Release /p:Version=${VERSION} --no-build --verbosity normal
        
+        - name: PACK
+          run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
+
         - name: PUSH
-          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN}
+          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://api.nuget.org/v3/index.json
           env:
             GITHUB_TOKEN: ${{ secrets.NUGET_TOKEN }}
