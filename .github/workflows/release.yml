@@ -36,6 +36,6 @@ jobs:
             NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
 
         - name: PUSH TO GITHUB NUGET
-          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://nuget.pkg.github.com/hoesein/index.json 
+          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GH_NUGET_TOKEN} --source https://nuget.pkg.github.com/hoesein/index.json 
           env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GH_NUGET_TOKEN: ${{ secrets.GH_NUGET_TOKEN }}
