@@ -31,7 +31,7 @@ jobs:
           run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
 
         - name: PUSH TO NUGET SERVER
-          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${NUGET_TOKEN} --source https://api.nuget.org/v3/index.json
+          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${NUGET_TOKEN} --source https://api.nuget.org/v3/index.json --skip-duplicate
           env:
             NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
 
