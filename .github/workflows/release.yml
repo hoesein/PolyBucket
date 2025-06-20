@@ -36,6 +36,6 @@ jobs:
             NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
 
         - name: PUSH TO GITHUB NUGET
-          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://nuget.pkg.github.com/OWNER/index.json --name github
+          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://nuget.pkg.github.com/OWNER/index.json 
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
