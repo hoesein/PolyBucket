@@ -30,7 +30,12 @@ jobs:
         - name: PACK
           run: dotnet pack -c Release /p:Version=${VERSION} --no-build --output .
 
-        - name: PUSH
-          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://api.nuget.org/v3/index.json
+        - name: PUSH TO NUGET SERVER
+          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${NUGET_TOKEN} --source https://api.nuget.org/v3/index.json
           env:
-            GITHUB_TOKEN: ${{ secrets.NUGET_TOKEN }}
+            NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+
+        - name: PUSH TO GITHUB NUGET
+          run: dotnet nuget push PolyBucket.Net.${VERSION}.nupkg --api-key ${GITHUB_TOKEN} --source https://nuget.pkg.github.com/OWNER/index.json --name github
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
