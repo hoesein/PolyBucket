@@ -16,26 +16,35 @@ public static class DependencyInjection
     {
         services.Configure<ObjectStorageOptions>(config.GetSection("ObjectStorage"));
 
-        services.AddSingleton<IAmazonS3>(opt =>
-        {
-            var options = opt.GetRequiredService<IOptions<ObjectStorageOptions>>().Value;
-            var loggerFactory = opt.GetRequiredService<ILoggerFactory>();
-            var config = new AmazonS3Config
-            {
-                ServiceURL = options.Endpoint,
-                RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(options.Region ?? "us-east-1"),
-                Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds),
-                MaxErrorRetry = 3,
-                ForcePathStyle = true // Use path-style URLs for S3 compatibility
-            };
-            return new AmazonS3Client(options.AccessKey, options.SecretKey, config);
-        });
+        var storageOpt = new ObjectStorageOptions();
+        config.GetSection("ObjectStorage").Bind(storageOpt);
 
-        services.AddSingleton<IObsClient>(provider =>
+        if (storageOpt.Provider == StorageProvider.AwsS3)
         {
-            var options = provider.GetRequiredService<IOptions<ObjectStorageOptions>>().Value;
-            return new ObsClientWrapper(options.AccessKey, options.SecretKey, options.Endpoint);
-        });
+            services.AddSingleton<IAmazonS3>(opt =>
+            {
+                var options = opt.GetRequiredService<IOptions<ObjectStorageOptions>>().Value;
+                var loggerFactory = opt.GetRequiredService<ILoggerFactory>();
+                var config = new AmazonS3Config
+                {
+                    ServiceURL = options.Endpoint,
+                    RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(options.Region ?? "us-east-1"),
+                    Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds),
+                    MaxErrorRetry = 3,
+                    ForcePathStyle = true // Use path-style URLs for S3 compatibility
+                };
+                return new AmazonS3Client(options.AccessKey, options.SecretKey, config);
+            });
+        }
+
+        if (storageOpt.Provider == StorageProvider.HuaweiObs)
+        {
+            services.AddSingleton<IObsClient>(provider =>
+            {
+                var options = provider.GetRequiredService<IOptions<ObjectStorageOptions>>().Value;
+                return new ObsClientWrapper(options.AccessKey, options.SecretKey, options.Endpoint);
+            });
+        }
 
         services.AddTransient<IObjectStorageService>(provider =>
         {
